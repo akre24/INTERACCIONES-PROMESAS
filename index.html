@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cobranza · Bitácora de gestiones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#1b2733;
+    --ink-soft:#3a4750;
+    --paper:#eef1ee;
+    --paper-raised:#ffffff;
+    --line:#c9d0c9;
+    --gold:#a9791a;
+    --rust:#a6402f;
+    --teal:#2c6b5e;
+    --muted:#6b7680;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    font-size:15px;
+    line-height:1.5;
+  }
+  h1,h2,h3{
+    font-family:'Source Serif 4', Georgia, serif;
+    font-weight:600;
+    margin:0;
+    color:var(--ink);
+  }
+  .masthead{
+    border-bottom:2px solid var(--ink);
+    padding:28px 32px 18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .masthead h1{font-size:30px; letter-spacing:-0.01em;}
+  .masthead .sub{color:var(--muted); font-size:13.5px; margin-top:4px;}
+  .masthead .status{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--muted);
+    text-align:right;
+  }
+  .masthead .status button{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:12.5px;
+    border:1px solid var(--ink);
+    background:var(--paper-raised);
+    color:var(--ink);
+    padding:5px 10px;
+    border-radius:2px;
+    cursor:pointer;
+    margin-left:8px;
+  }
+  .masthead .status button:hover{background:var(--ink); color:var(--paper-raised);}
+
+  main{max-width:1240px; margin:0 auto; padding:0 32px 60px;}
+
+  .filters{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    align-items:flex-end;
+    padding:20px 0;
+    border-bottom:1px solid var(--line);
+    margin-bottom:24px;
+  }
+  .field{display:flex; flex-direction:column; gap:4px;}
+  .field label{font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted);}
+  .field input, .field select{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:13.5px;
+    padding:7px 9px;
+    border:1px solid var(--line);
+    border-radius:2px;
+    background:var(--paper-raised);
+    color:var(--ink);
+    min-width:150px;
+  }
+  .field input:focus, .field select:focus{outline:2px solid var(--gold); outline-offset:1px;}
+  .field.search input{min-width:220px;}
+  .reset-btn{
+    font-size:12.5px;
+    color:var(--muted);
+    background:none;
+    border:none;
+    text-decoration:underline;
+    cursor:pointer;
+    padding:8px 0;
+  }
+
+  .kpi-row{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    margin-bottom:32px;
+  }
+  .kpi{background:var(--paper-raised); padding:18px 20px;}
+  .kpi .num{font-family:'Source Serif 4', serif; font-size:32px; font-weight:600; line-height:1;}
+  .kpi .label{font-size:12px; color:var(--muted); margin-top:6px;}
+
+  .charts-row{
+    display:grid;
+    grid-template-columns:1.3fr 1fr 0.8fr;
+    gap:18px;
+    margin-bottom:32px;
+  }
+  .panel{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    padding:16px 18px 8px;
+  }
+  .panel h3{font-size:14px; font-weight:600; margin-bottom:10px; font-family:'IBM Plex Sans',sans-serif; text-transform:none;}
+  .panel .chart-wrap{position:relative; height:220px;}
+  .timeline-panel{grid-column:1 / -1;}
+  .timeline-panel .chart-wrap{height:200px;}
+
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  thead th{
+    text-align:left;
+    font-weight:600;
+    font-size:11.5px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--muted);
+    padding:8px 10px;
+    border-bottom:2px solid var(--ink);
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  thead th:hover{color:var(--ink);}
+  tbody td{
+    padding:7px 10px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  tbody tr:hover{background:#f6f7f4;}
+  .tag{
+    display:inline-block;
+    padding:1px 7px;
+    border-radius:2px;
+    font-size:11px;
+    font-weight:600;
+    color:#fff;
+  }
+  .tag.Rotas{background:var(--rust);}
+  .tag.Vigentes{background:var(--teal);}
+  .tag.Gracia{background:var(--gold);}
+  .tag.default{background:var(--muted);}
+  .mono{font-family:'IBM Plex Mono', monospace; font-size:12px;}
+
+  .table-panel{background:var(--paper-raised); border:1px solid var(--line); padding:18px;}
+  .table-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;}
+  .table-scroll{overflow-x:auto;}
+  .pager{display:flex; gap:8px; align-items:center; justify-content:flex-end; margin-top:12px; font-size:12.5px; color:var(--muted);}
+  .pager button{
+    border:1px solid var(--line);
+    background:var(--paper-raised);
+    padding:4px 10px;
+    border-radius:2px;
+    cursor:pointer;
+    font-family:'IBM Plex Sans', sans-serif;
+  }
+  .pager button:disabled{opacity:.4; cursor:default;}
+
+  .empty-note{padding:40px; text-align:center; color:var(--muted); font-size:13.5px;}
+
+  @media (max-width: 900px){
+    .kpi-row{grid-template-columns:repeat(2,1fr);}
+    .charts-row{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div>
+    <h1>Bit&aacute;cora de gestiones &mdash; Cobranza</h1>
+    <div class="sub">Interacciones (llamadas / WhatsApp) cruzadas contra promesas de pago Rotas, Vigentes y Gracia</div>
+  </div>
+  <div class="status">
+    <div id="lastUpdated">Cargando datos&hellip;</div>
+    <button id="refreshBtn">Actualizar</button>
+  </div>
+</div>
+
+<main>
+
+  <div class="filters" id="filters">
+    <div class="field search">
+      <label for="fSearch">Buscar (matr&iacute;cula / nombre)</label>
+      <input type="text" id="fSearch" placeholder="Ej. 21137024 o Garc&iacute;a">
+    </div>
+    <div class="field">
+      <label for="fTipo">Tipo</label>
+      <select id="fTipo"><option value="">Todos</option></select>
+    </div>
+    <div class="field">
+      <label for="fCampana">Campa&ntilde;a</label>
+      <select id="fCampana"><option value="">Todas</option></select>
+    </div>
+    <div class="field">
+      <label for="fAgente">Agente</label>
+      <select id="fAgente"><option value="">Todos</option></select>
+    </div>
+    <div class="field">
+      <label for="fDesde">Desde</label>
+      <input type="date" id="fDesde">
+    </div>
+    <div class="field">
+      <label for="fHasta">Hasta</label>
+      <input type="date" id="fHasta">
+    </div>
+    <button class="reset-btn" id="resetBtn">Limpiar filtros</button>
+  </div>
+
+  <div class="kpi-row" id="kpiRow">
+    <div class="kpi"><div class="num" id="kpiTotal">&mdash;</div><div class="label">Interacciones</div></div>
+    <div class="kpi"><div class="num" id="kpiMatriculas">&mdash;</div><div class="label">Matr&iacute;culas &uacute;nicas</div></div>
+    <div class="kpi"><div class="num" id="kpiAgentes">&mdash;</div><div class="label">Agentes activos</div></div>
+    <div class="kpi"><div class="num" id="kpiExito">&mdash;</div><div class="label">% marcadas Exitoso</div></div>
+  </div>
+
+  <div class="charts-row">
+    <div class="panel">
+      <h3>Interacciones por agente (top 15)</h3>
+      <div class="chart-wrap"><canvas id="chartAgente"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>Interacciones por campa&ntilde;a</h3>
+      <div class="chart-wrap"><canvas id="chartCampana"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>Por tipo</h3>
+      <div class="chart-wrap"><canvas id="chartTipo"></canvas></div>
+    </div>
+    <div class="panel timeline-panel">
+      <h3>L&iacute;nea de tiempo &mdash; interacciones por d&iacute;a</h3>
+      <div class="chart-wrap"><canvas id="chartTimeline"></canvas></div>
+    </div>
+  </div>
+
+  <div class="table-panel">
+    <div class="table-head">
+      <h3>Detalle de interacciones</h3>
+      <div class="mono" id="tableCount" style="color:var(--muted); font-size:12.5px;"></div>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th data-key="fecha">Fecha</th>
+            <th data-key="tipo">Tipo</th>
+            <th data-key="matricula">Matr&iacute;cula</th>
+            <th data-key="nombre">Nombre</th>
+            <th data-key="agente">Agente</th>
+            <th data-key="campana">Campa&ntilde;a</th>
+            <th data-key="disposicion">Disposici&oacute;n</th>
+            <th data-key="origen">Origen promesa</th>
+            <th data-key="duracion">Duraci&oacute;n</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+    <div class="pager">
+      <span id="pagerInfo"></span>
+      <button id="prevPage">&larr; Anterior</button>
+      <button id="nextPage">Siguiente &rarr;</button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTAjZlFa-5U6g_rHpPgIlKlQrOlrT9UEFZlsdrynL2tznQlR8A5GAA8GqiQ3MoxC1bjhxAKksk9rCXt/pub?output=csv";
+
+let RAW = [];       // parsed rows, normalized
+let FILTERED = [];
+let page = 1;
+const PAGE_SIZE = 40;
+let sortKey = "fecha";
+let sortDir = -1;
+
+const charts = {};
+
+function parseDurationToSeconds(s){
+  if(!s) return 0;
+  const parts = s.split(":").map(Number);
+  if(parts.some(isNaN)) return 0;
+  let sec = 0;
+  for(const p of parts){ sec = sec*60 + p; }
+  return sec;
+}
+
+function fmtDuration(totalSec){
+  const h = Math.floor(totalSec/3600);
+  const m = Math.floor((totalSec%3600)/60);
+  const s = Math.floor(totalSec%60);
+  return (h>0? h+"h ":"") + (m>0||h>0? m+"m ":"") + s+"s";
+}
+
+function normalizeRow(r){
+  const fechaRaw = r["Fecha de inicio"] || "";
+  const d = fechaRaw ? new Date(fechaRaw) : null;
+  return {
+    fechaRaw,
+    fecha: d && !isNaN(d) ? d : null,
+    tipo: r["Archivo"] || "",
+    campana: r["Campa\u00f1a"] || "",
+    agente: r["Agente_Atendi\u00f3"] || "(sin agente)",
+    matricula: r["MATRICULA"] || "",
+    nombre: r["NOMBRE"] || "",
+    supervisor: r["SUPERVISOR"] || "",
+    disposicion: r["Disp."] || "",
+    exito: (r["\u00c9xito"] || "").trim(),
+    origen: r["ORIGEN_PROMESA"] || "",
+    duracionSec: parseDurationToSeconds(r["Tpo. Dur."] || ""),
+  };
+}
+
+function populateSelect(sel, values){
+  const current = sel.value;
+  const opts = ['<option value="">' + sel.querySelector("option").textContent + "</option>"];
+  values.forEach(v => opts.push(`<option value="${v.replace(/"/g,'&quot;')}">${v}</option>`));
+  sel.innerHTML = opts.join("");
+  if(values.includes(current)) sel.value = current;
+}
+
+function uniqueSorted(arr){
+  return [...new Set(arr.filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+}
+
+function applyFilters(){
+  const q = document.getElementById("fSearch").value.trim().toLowerCase();
+  const tipo = document.getElementById("fTipo").value;
+  const campana = document.getElementById("fCampana").value;
+  const agente = document.getElementById("fAgente").value;
+  const desde = document.getElementById("fDesde").value ? new Date(document.getElementById("fDesde").value+"T00:00:00Z") : null;
+  const hasta = document.getElementById("fHasta").value ? new Date(document.getElementById("fHasta").value+"T23:59:59Z") : null;
+
+  FILTERED = RAW.filter(row=>{
+    if(tipo && row.tipo !== tipo) return false;
+    if(campana && row.campana !== campana) return false;
+    if(agente && row.agente !== agente) return false;
+    if(desde && (!row.fecha || row.fecha < desde)) return false;
+    if(hasta && (!row.fecha || row.fecha > hasta)) return false;
+    if(q){
+      const hay = (row.matricula+" "+row.nombre).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  page = 1;
+  renderKPIs();
+  renderCharts();
+  renderTable();
+}
+
+function renderKPIs(){
+  const total = FILTERED.length;
+  const matriculas = new Set(FILTERED.map(r=>r.matricula).filter(Boolean)).size;
+  const agentes = new Set(FILTERED.map(r=>r.agente).filter(Boolean)).size;
+  const exitoCount = FILTERED.filter(r=>r.exito.toLowerCase()==="exitoso" || r.disposicion.toLowerCase().startsWith("exitoso") || r.exito==="Si").length;
+  document.getElementById("kpiTotal").textContent = total.toLocaleString("es-MX");
+  document.getElementById("kpiMatriculas").textContent = matriculas.toLocaleString("es-MX");
+  document.getElementById("kpiAgentes").textContent = agentes.toLocaleString("es-MX");
+  document.getElementById("kpiExito").textContent = total ? Math.round(100*exitoCount/total)+"%" : "0%";
+}
+
+function countBy(arr, keyFn){
+  const m = new Map();
+  arr.forEach(r=>{
+    const k = keyFn(r) || "(sin dato)";
+    m.set(k, (m.get(k)||0)+1);
+  });
+  return m;
+}
+
+function topN(map, n){
+  return [...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,n);
+}
+
+function destroyChart(id){
+  if(charts[id]){ charts[id].destroy(); delete charts[id]; }
+}
+
+function renderCharts(){
+  // por agente
+  const agenteCounts = topN(countBy(FILTERED, r=>r.agente), 15);
+  destroyChart("agente");
+  charts.agente = new Chart(document.getElementById("chartAgente"), {
+    type:"bar",
+    data:{ labels: agenteCounts.map(x=>x[0]), datasets:[{ data: agenteCounts.map(x=>x[1]), backgroundColor:"#a9791a" }] },
+    options:{ indexAxis:"y", plugins:{legend:{display:false}}, scales:{ x:{beginAtZero:true} }, responsive:true, maintainAspectRatio:false }
+  });
+
+  // por campana
+  const campanaCounts = topN(countBy(FILTERED, r=>r.campana), 12);
+  destroyChart("campana");
+  charts.campana = new Chart(document.getElementById("chartCampana"), {
+    type:"bar",
+    data:{ labels: campanaCounts.map(x=>x[0]), datasets:[{ data: campanaCounts.map(x=>x[1]), backgroundColor:"#2c6b5e" }] },
+    options:{ plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true}, x:{ticks:{autoSkip:false, maxRotation:60, minRotation:40, font:{size:10}}} }, responsive:true, maintainAspectRatio:false }
+  });
+
+  // por tipo
+  const tipoCounts = countBy(FILTERED, r=>r.tipo);
+  destroyChart("tipo");
+  charts.tipo = new Chart(document.getElementById("chartTipo"), {
+    type:"doughnut",
+    data:{ labels:[...tipoCounts.keys()], datasets:[{ data:[...tipoCounts.values()], backgroundColor:["#a6402f","#2c6b5e","#a9791a","#6b7680"] }] },
+    options:{ plugins:{legend:{position:"bottom", labels:{boxWidth:12, font:{size:11}}}}, responsive:true, maintainAspectRatio:false }
+  });
+
+  // timeline
+  const dayCounts = new Map();
+  FILTERED.forEach(r=>{
+    if(!r.fecha) return;
+    const key = r.fecha.toISOString().slice(0,10);
+    dayCounts.set(key, (dayCounts.get(key)||0)+1);
+  });
+  const days = [...dayCounts.keys()].sort();
+  destroyChart("timeline");
+  charts.timeline = new Chart(document.getElementById("chartTimeline"), {
+    type:"line",
+    data:{ labels: days, datasets:[{ data: days.map(d=>dayCounts.get(d)), borderColor:"#1b2733", backgroundColor:"rgba(27,39,51,0.08)", fill:true, tension:0.25, pointRadius:2 }] },
+    options:{ plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true} }, responsive:true, maintainAspectRatio:false }
+  });
+}
+
+function sortedFiltered(){
+  const arr = [...FILTERED];
+  arr.sort((a,b)=>{
+    let av = a[sortKey], bv = b[sortKey];
+    if(sortKey === "fecha"){ av = a.fecha ? a.fecha.getTime() : 0; bv = b.fecha ? b.fecha.getTime() : 0; }
+    else if(sortKey === "duracion"){ av = a.duracionSec; bv = b.duracionSec; }
+    else { av = (av||"").toString().toLowerCase(); bv = (bv||"").toString().toLowerCase(); }
+    if(av < bv) return -1*sortDir;
+    if(av > bv) return 1*sortDir;
+    return 0;
+  });
+  return arr;
+}
+
+function tagHTML(origen){
+  if(!origen) return "";
+  return origen.split(",").map(o=>{
+    const t = o.trim();
+    const cls = ["Rotas","Vigentes","Gracia"].includes(t) ? t : "default";
+    return `<span class="tag ${cls}">${t}</span>`;
+  }).join(" ");
+}
+
+function renderTable(){
+  const sorted = sortedFiltered();
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  page = Math.min(page, totalPages);
+  const start = (page-1)*PAGE_SIZE;
+  const pageRows = sorted.slice(start, start+PAGE_SIZE);
+
+  const tbody = document.getElementById("tableBody");
+  if(pageRows.length === 0){
+    tbody.innerHTML = `<tr><td colspan="9" class="empty-note">Sin resultados para estos filtros.</td></tr>`;
+  } else {
+    tbody.innerHTML = pageRows.map(r=>`
+      <tr>
+        <td class="mono">${r.fecha ? r.fecha.toLocaleString("es-MX",{timeZone:"UTC", day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}) : "&mdash;"}</td>
+        <td>${r.tipo}</td>
+        <td class="mono">${r.matricula || "&mdash;"}</td>
+        <td>${r.nombre || "&mdash;"}</td>
+        <td>${r.agente}</td>
+        <td>${r.campana}</td>
+        <td>${r.disposicion || "&mdash;"}</td>
+        <td>${tagHTML(r.origen)}</td>
+        <td class="mono">${fmtDuration(r.duracionSec)}</td>
+      </tr>
+    `).join("");
+  }
+
+  document.getElementById("tableCount").textContent = sorted.length.toLocaleString("es-MX") + " registros";
+  document.getElementById("pagerInfo").textContent = `P\u00e1gina ${page} de ${totalPages}`;
+  document.getElementById("prevPage").disabled = page<=1;
+  document.getElementById("nextPage").disabled = page>=totalPages;
+}
+
+function wireEvents(){
+  ["fSearch","fTipo","fCampana","fAgente","fDesde","fHasta"].forEach(id=>{
+    document.getElementById(id).addEventListener("input", applyFilters);
+    document.getElementById(id).addEventListener("change", applyFilters);
+  });
+  document.getElementById("resetBtn").addEventListener("click", ()=>{
+    ["fSearch","fDesde","fHasta"].forEach(id=>document.getElementById(id).value="");
+    ["fTipo","fCampana","fAgente"].forEach(id=>document.getElementById(id).value="");
+    applyFilters();
+  });
+  document.getElementById("prevPage").addEventListener("click", ()=>{ page--; renderTable(); });
+  document.getElementById("nextPage").addEventListener("click", ()=>{ page++; renderTable(); });
+  document.querySelectorAll("thead th").forEach(th=>{
+    th.addEventListener("click", ()=>{
+      const key = th.dataset.key;
+      if(sortKey === key){ sortDir *= -1; } else { sortKey = key; sortDir = 1; }
+      renderTable();
+    });
+  });
+  document.getElementById("refreshBtn").addEventListener("click", loadData);
+}
+
+function loadData(){
+  document.getElementById("lastUpdated").textContent = "Actualizando\u2026";
+  Papa.parse(CSV_URL, {
+    download:true,
+    header:true,
+    skipEmptyLines:true,
+    complete: function(results){
+      RAW = results.data.map(normalizeRow).filter(r=>r.fechaRaw);
+      populateSelect(document.getElementById("fTipo"), uniqueSorted(RAW.map(r=>r.tipo)));
+      populateSelect(document.getElementById("fCampana"), uniqueSorted(RAW.map(r=>r.campana)));
+      populateSelect(document.getElementById("fAgente"), uniqueSorted(RAW.map(r=>r.agente)));
+      document.getElementById("lastUpdated").textContent = "Actualizado " + new Date().toLocaleString("es-MX");
+      applyFilters();
+    },
+    error: function(err){
+      document.getElementById("lastUpdated").textContent = "Error al cargar datos";
+      console.error(err);
+    }
+  });
+}
+
+wireEvents();
+loadData();
+</script>
+</body>
+</html>
