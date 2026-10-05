@@ -11,131 +11,83 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root{
-    --navy:#14284b;
-    --navy-2:#1f3a68;
-    --teal:#13857a;
-    --amber:#d9922b;
-    --bg:#f3f5f9;
-    --card:#ffffff;
-    --line:#e2e7ef;
-    --ink:#16233b;
-    --muted:#6a7690;
-    --c-cobranza:#14284b;
-    --c-procodesk:#13857a;
-    --c-otros:#d9922b;
+    --navy:#14284b; --navy-2:#1f3a68; --teal:#13857a; --amber:#d9922b;
+    --bg:#f3f5f9; --card:#ffffff; --line:#e2e7ef; --ink:#16233b; --muted:#6a7690;
+    --c-cobranza:#14284b; --c-procodesk:#13857a; --c-otros:#d9922b;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
-  body{
-    background:var(--bg);
-    color:var(--ink);
-    font-family:'Plus Jakarta Sans', system-ui, sans-serif;
-    font-size:14px;
-    line-height:1.5;
-    -webkit-font-smoothing:antialiased;
-  }
-  h1,h2,h3{margin:0; font-weight:700;}
+  body{background:var(--bg);color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3{margin:0;font-weight:700;}
+  [hidden]{display:none !important;}
 
-  .topbar{
-    background:var(--navy);
-    color:#fff;
-    padding:22px 40px;
-    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;
-  }
-  .topbar h1{font-size:22px; font-weight:800; letter-spacing:-.01em;}
-  .topbar .sub{font-size:13px; color:#b7c4de; margin-top:2px;}
-  .topbar .status{display:flex; align-items:center; gap:14px; font-size:12.5px; color:#b7c4de;}
-  .topbar button{
-    font-family:inherit; font-size:13px; font-weight:600;
-    background:#fff; color:var(--navy);
-    border:none; border-radius:6px; padding:8px 16px; cursor:pointer;
-  }
+  .topbar{background:var(--navy);color:#fff;padding:22px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;}
+  .topbar h1{font-size:22px;font-weight:800;letter-spacing:-.01em;}
+  .topbar .sub{font-size:13px;color:#b7c4de;margin-top:2px;}
+  .topbar .status{display:flex;align-items:center;gap:14px;font-size:12.5px;color:#b7c4de;}
+  .topbar button{font-family:inherit;font-size:13px;font-weight:600;background:#fff;color:var(--navy);border:none;border-radius:6px;padding:8px 16px;cursor:pointer;}
   .topbar button:hover{background:#e6ecf7;}
-  .topbar button:focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
+  .topbar button:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
 
-  main{max-width:1320px; margin:0 auto; padding:28px 40px 56px;}
+  .tabs{background:#fff;border-bottom:1px solid var(--line);padding:0 40px;display:flex;gap:6px;}
+  .tab{font-family:inherit;font-size:13.5px;font-weight:600;color:var(--muted);background:none;border:none;border-bottom:3px solid transparent;padding:14px 16px 11px;cursor:pointer;}
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:var(--navy);border-bottom-color:var(--navy);}
+  .tab:focus-visible{outline:2px solid var(--navy-2);outline-offset:-2px;}
 
-  .filters{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:10px;
-    padding:16px 20px;
-    display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;
-    margin-bottom:22px;
-  }
-  .field{display:flex; flex-direction:column; gap:5px;}
-  .field label{font-size:12px; font-weight:600; color:var(--muted);}
-  .field input,.field select{
-    font-family:inherit; font-size:13.5px; color:var(--ink);
-    padding:8px 10px; min-width:150px;
-    border:1px solid var(--line); border-radius:6px; background:#fff;
-  }
+  main{max-width:1320px;margin:0 auto;padding:28px 40px 56px;}
+
+  .filters{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 20px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;margin-bottom:22px;}
+  .field{display:flex;flex-direction:column;gap:5px;}
+  .field label{font-size:12px;font-weight:600;color:var(--muted);}
+  .field input,.field select{font-family:inherit;font-size:13.5px;color:var(--ink);padding:8px 10px;min-width:150px;border:1px solid var(--line);border-radius:6px;background:#fff;}
   .field.search input{min-width:230px;}
-  .field input:focus,.field select:focus{outline:2px solid var(--navy-2); outline-offset:1px;}
-  .reset-btn{
-    font-family:inherit; font-size:13px; font-weight:600; color:var(--navy-2);
-    background:none; border:none; cursor:pointer; padding:9px 4px; margin-left:auto;
-  }
+  .field input:focus,.field select:focus{outline:2px solid var(--navy-2);outline-offset:1px;}
+  .reset-btn{font-family:inherit;font-size:13px;font-weight:600;color:var(--navy-2);background:none;border:none;cursor:pointer;padding:9px 4px;margin-left:auto;}
   .reset-btn:hover{text-decoration:underline;}
 
-  .kpi-row{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:22px;}
-  .kpi{
-    background:var(--card); border:1px solid var(--line); border-radius:10px;
-    padding:20px 22px; border-top:3px solid var(--navy);
-  }
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px 22px;border-top:3px solid var(--navy);}
   .kpi:nth-child(2){border-top-color:var(--teal);}
   .kpi:nth-child(3){border-top-color:var(--amber);}
   .kpi:nth-child(4){border-top-color:var(--navy-2);}
-  .kpi .label{font-size:12.5px; font-weight:600; color:var(--muted);}
-  .kpi .num{font-size:34px; font-weight:800; letter-spacing:-.02em; line-height:1.15; margin-top:6px;}
+  .kpi .label{font-size:12.5px;font-weight:600;color:var(--muted);}
+  .kpi .num{font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1.15;margin-top:6px;}
+  .kpi .num.money{font-size:28px;}
 
-  .grid{display:grid; grid-template-columns:repeat(6,1fr); gap:16px; margin-bottom:22px;}
-  .panel{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px 20px 12px;}
-  .panel h3{font-size:14px; margin-bottom:12px;}
-  .chart-wrap{position:relative; height:240px;}
+  .grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-bottom:22px;}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px 12px;}
+  .panel h3{font-size:14px;margin-bottom:12px;}
+  .chart-wrap{position:relative;height:240px;}
   .span-4{grid-column:span 4;} .span-2{grid-column:span 2;} .span-3{grid-column:span 3;}
 
-  .table-panel{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:20px;}
-  .table-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;}
+  .table-panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px;}
+  .table-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;}
   .table-head h3{font-size:15px;}
-  .count{font-size:12.5px; color:var(--muted); font-weight:500;}
+  .count{font-size:12.5px;color:var(--muted);font-weight:500;}
   .table-scroll{overflow-x:auto;}
-  table{width:100%; border-collapse:collapse; font-size:13px;}
-  thead th{
-    text-align:left; font-size:12px; font-weight:600; color:var(--muted);
-    background:#f7f9fc; padding:10px 12px; border-bottom:1px solid var(--line);
-    white-space:nowrap; cursor:pointer; user-select:none;
-  }
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{text-align:left;font-size:12px;font-weight:600;color:var(--muted);background:#f7f9fc;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;user-select:none;}
   thead th:hover{color:var(--ink);}
-  thead th.sorted::after{content:attr(data-arrow); margin-left:5px; color:var(--navy-2);}
-  tbody td{padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top;}
+  thead th.sorted::after{content:attr(data-arrow);margin-left:5px;color:var(--navy-2);}
+  tbody td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;}
   tbody tr:hover{background:#f7f9fc;}
-  .num-cell{font-variant-numeric:tabular-nums; white-space:nowrap;}
-  .badge{
-    display:inline-block; padding:2px 9px; border-radius:999px;
-    font-size:11.5px; font-weight:600; color:#fff; background:var(--muted);
-  }
-  .badge.Cobranza{background:var(--c-cobranza);}
-  .badge.Procodesk{background:var(--c-procodesk);}
-  .badge.Otros{background:var(--c-otros);}
-  .empty-note{padding:40px; text-align:center; color:var(--muted);}
-  .pager{display:flex; gap:8px; align-items:center; justify-content:flex-end; margin-top:14px; font-size:12.5px; color:var(--muted);}
-  .pager button{
-    font-family:inherit; font-size:12.5px; font-weight:600; color:var(--navy);
-    border:1px solid var(--line); background:#fff; padding:6px 12px; border-radius:6px; cursor:pointer;
-  }
-  .pager button:disabled{opacity:.4; cursor:default;}
+  .num-cell{font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:600;color:#fff;background:var(--muted);white-space:nowrap;}
+  .badge.Cobranza{background:var(--c-cobranza);} .badge.Procodesk{background:var(--c-procodesk);} .badge.Otros{background:var(--c-otros);}
+  .badge.ok{background:var(--teal);} .badge.bad{background:#b5483a;}
+  .empty-note{padding:40px;text-align:center;color:var(--muted);}
+  .pager{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:14px;font-size:12.5px;color:var(--muted);}
+  .pager button{font-family:inherit;font-size:12.5px;font-weight:600;color:var(--navy);border:1px solid var(--line);background:#fff;padding:6px 12px;border-radius:6px;cursor:pointer;}
+  .pager button:disabled{opacity:.4;cursor:default;}
 
   @media (max-width:1000px){
     .kpi-row{grid-template-columns:repeat(2,1fr);}
     .span-4,.span-2,.span-3{grid-column:1 / -1;}
-    main{padding:20px 16px 40px;} .topbar{padding:18px 16px;}
+    main{padding:20px 16px 40px;} .topbar{padding:18px 16px;} .tabs{padding:0 16px;}
     .reset-btn{margin-left:0;}
   }
-  @media print{
-    .topbar button,.filters,.pager{display:none;}
-    body{background:#fff;}
-  }
+  @media print{ .topbar button,.filters,.pager,.tabs{display:none;} body{background:#fff;} }
 </style>
 </head>
 <body>
@@ -151,37 +103,25 @@
   </div>
 </header>
 
-<main>
+<nav class="tabs" aria-label="Vistas">
+  <button class="tab active" data-view="viewBitacora">Bitácora</button>
+  <button class="tab" data-view="viewPromesas">Promesas de pago</button>
+</nav>
+
+<!-- ============ VISTA 1: BITÁCORA ============ -->
+<main id="viewBitacora">
 
   <section class="filters" aria-label="Filtros">
     <div class="field search">
       <label for="fSearch">Buscar matrícula o nombre</label>
       <input type="text" id="fSearch" placeholder="Ej. 21137024 o García">
     </div>
-    <div class="field">
-      <label for="fGrupo">Grupo de campaña</label>
-      <select id="fGrupo"><option value="">Todos</option></select>
-    </div>
-    <div class="field">
-      <label for="fCampana">Campaña</label>
-      <select id="fCampana"><option value="">Todas</option></select>
-    </div>
-    <div class="field">
-      <label for="fTipo">Tipo</label>
-      <select id="fTipo"><option value="">Todos</option></select>
-    </div>
-    <div class="field">
-      <label for="fAgente">Agente</label>
-      <select id="fAgente"><option value="">Todos</option></select>
-    </div>
-    <div class="field">
-      <label for="fDesde">Desde</label>
-      <input type="date" id="fDesde">
-    </div>
-    <div class="field">
-      <label for="fHasta">Hasta</label>
-      <input type="date" id="fHasta">
-    </div>
+    <div class="field"><label for="fGrupo">Grupo de campaña</label><select id="fGrupo"><option value="">Todos</option></select></div>
+    <div class="field"><label for="fCampana">Campaña</label><select id="fCampana"><option value="">Todas</option></select></div>
+    <div class="field"><label for="fTipo">Tipo</label><select id="fTipo"><option value="">Todos</option></select></div>
+    <div class="field"><label for="fAgente">Agente</label><select id="fAgente"><option value="">Todos</option></select></div>
+    <div class="field"><label for="fDesde">Desde</label><input type="date" id="fDesde"></div>
+    <div class="field"><label for="fHasta">Hasta</label><input type="date" id="fHasta"></div>
     <button class="reset-btn" id="resetBtn">Limpiar filtros</button>
   </section>
 
@@ -193,58 +133,85 @@
   </section>
 
   <section class="grid">
-    <div class="panel span-4">
-      <h3>Interacciones por día</h3>
-      <div class="chart-wrap"><canvas id="chartTimeline"></canvas></div>
-    </div>
-    <div class="panel span-2">
-      <h3>Distribución por grupo de campaña</h3>
-      <div class="chart-wrap"><canvas id="chartGrupo"></canvas></div>
-    </div>
-    <div class="panel span-3">
-      <h3>Interacciones por agente (top 15)</h3>
-      <div class="chart-wrap" style="height:300px"><canvas id="chartAgente"></canvas></div>
-    </div>
-    <div class="panel span-3">
-      <h3>Interacciones por campaña</h3>
-      <div class="chart-wrap" style="height:300px"><canvas id="chartCampana"></canvas></div>
-    </div>
+    <div class="panel span-4"><h3>Interacciones por día</h3><div class="chart-wrap"><canvas id="chartTimeline"></canvas></div></div>
+    <div class="panel span-2"><h3>Distribución por grupo de campaña</h3><div class="chart-wrap"><canvas id="chartGrupo"></canvas></div></div>
+    <div class="panel span-3"><h3>Interacciones por agente (top 15)</h3><div class="chart-wrap" style="height:300px"><canvas id="chartAgente"></canvas></div></div>
+    <div class="panel span-3"><h3>Interacciones por campaña</h3><div class="chart-wrap" style="height:300px"><canvas id="chartCampana"></canvas></div></div>
   </section>
 
   <section class="table-panel">
-    <div class="table-head">
-      <h3>Detalle de interacciones</h3>
-      <div class="count" id="tableCount"></div>
-    </div>
+    <div class="table-head"><h3>Detalle de interacciones</h3><div class="count" id="tableCount"></div></div>
     <div class="table-scroll">
       <table>
         <thead>
           <tr>
-            <th data-key="fecha">Fecha</th>
-            <th data-key="tipo">Tipo</th>
-            <th data-key="matricula">Matrícula</th>
-            <th data-key="nombre">Nombre</th>
-            <th data-key="agente">Agente</th>
-            <th data-key="grupo">Grupo</th>
-            <th data-key="campana">Campaña</th>
-            <th data-key="disposicion">Disposición</th>
-            <th data-key="duracion">Duración</th>
+            <th data-key="fecha">Fecha</th><th data-key="tipo">Tipo</th><th data-key="matricula">Matrícula</th>
+            <th data-key="nombre">Nombre</th><th data-key="agente">Agente</th><th data-key="grupo">Grupo</th>
+            <th data-key="campana">Campaña</th><th data-key="disposicion">Disposición</th><th data-key="duracion">Duración</th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
       </table>
     </div>
-    <div class="pager">
-      <span id="pagerInfo"></span>
-      <button id="prevPage">Anterior</button>
-      <button id="nextPage">Siguiente</button>
+    <div class="pager"><span id="pagerInfo"></span><button id="prevPage">Anterior</button><button id="nextPage">Siguiente</button></div>
+  </section>
+
+</main>
+
+<!-- ============ VISTA 2: PROMESAS DE PAGO ============ -->
+<main id="viewPromesas" hidden>
+
+  <section class="filters" aria-label="Filtros de promesas">
+    <div class="field search">
+      <label for="pSearch">Buscar matrícula o nombre</label>
+      <input type="text" id="pSearch" placeholder="Ej. 010227166 o García">
     </div>
+    <div class="field"><label for="pTipo">Tipo de contacto</label><select id="pTipo"><option value="">Todos</option></select></div>
+    <div class="field"><label for="pAsesor">Asesor</label><select id="pAsesor"><option value="">Todos</option></select></div>
+    <div class="field"><label for="pSup">Supervisor</label><select id="pSup"><option value="">Todos</option></select></div>
+    <div class="field"><label for="pValid">Validación</label><select id="pValid"><option value="">Todas</option></select></div>
+    <div class="field"><label for="pCheck">Check</label><select id="pCheck"><option value="">Todos</option></select></div>
+    <div class="field"><label for="pDesde">Gestión desde</label><input type="date" id="pDesde"></div>
+    <div class="field"><label for="pHasta">Gestión hasta</label><input type="date" id="pHasta"></div>
+    <button class="reset-btn" id="pResetBtn">Limpiar filtros</button>
+  </section>
+
+  <section class="kpi-row">
+    <div class="kpi"><div class="label">Promesas</div><div class="num" id="pKpiTotal">—</div></div>
+    <div class="kpi"><div class="label">Monto prometido</div><div class="num money" id="pKpiMonto">—</div></div>
+    <div class="kpi"><div class="label">Pagos realizados</div><div class="num money" id="pKpiPagado">—</div></div>
+    <div class="kpi"><div class="label">Promesas efectivas</div><div class="num" id="pKpiEfectivas">—</div></div>
+  </section>
+
+  <section class="grid">
+    <div class="panel span-4"><h3>Promesas por día de gestión</h3><div class="chart-wrap"><canvas id="pChartDia"></canvas></div></div>
+    <div class="panel span-2"><h3>Por tipo de contacto</h3><div class="chart-wrap"><canvas id="pChartTipo"></canvas></div></div>
+  </section>
+
+  <section class="table-panel">
+    <div class="table-head"><h3>Detalle de promesas</h3><div class="count" id="pTableCount"></div></div>
+    <div class="table-scroll">
+      <table>
+        <thead id="pHead">
+          <tr>
+            <th data-key="fecha">Fecha gestión</th><th data-key="matricula">Matrícula</th><th data-key="nombre">Nombre</th>
+            <th data-key="asesor">Asesor</th><th data-key="tipo">Tipo de contacto</th><th data-key="fechaPromesa">Fecha promesa</th>
+            <th data-key="monto">Monto prometido</th><th data-key="pagado">Pagos realizados</th>
+            <th data-key="valid">Validación</th><th data-key="check">Check</th>
+            <th data-key="supervisor">Supervisor</th><th data-key="mora">Mora inicial</th>
+          </tr>
+        </thead>
+        <tbody id="pBody"></tbody>
+      </table>
+    </div>
+    <div class="pager"><span id="pPagerInfo"></span><button id="pPrev">Anterior</button><button id="pNext">Siguiente</button></div>
   </section>
 
 </main>
 
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTAjZlFa-5U6g_rHpPgIlKlQrOlrT9UEFZlsdrynL2tznQlR8A5GAA8GqiQ3MoxC1bjhxAKksk9rCXt/pub?output=csv";
+const PROMESAS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1hSI6MpGQl3_3V6s_6a-wvCDfSxQLCEkpJppJt72ncrT0SuAFwbXL6tAfXJn6QoWdA_y9_aHrEBMf/pub?output=csv";
 
 const GROUP_COLORS = {Cobranza:"#14284b", Procodesk:"#13857a", Otros:"#d9922b"};
 const GROUP_ORDER = ["Cobranza","Procodesk","Otros"];
@@ -258,44 +225,38 @@ Chart.defaults.font.family = "'Plus Jakarta Sans', system-ui, sans-serif";
 Chart.defaults.color = "#6a7690";
 Chart.defaults.borderColor = "#e9edf4";
 
+const $ = id => document.getElementById(id);
+const uniqueSorted = arr => [...new Set(arr.filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+
 function grupoDeCampana(nombre){
   const n = (nombre || "").toLowerCase();
   if(n.includes("cobranza") || n.includes("cxc")) return "Cobranza";
   if(n.includes("procodesk")) return "Procodesk";
   return "Otros";
 }
-
 function parseDurationToSeconds(s){
   if(!s) return 0;
   const parts = s.split(":").map(Number);
   if(parts.some(isNaN)) return 0;
   return parts.reduce((acc,p)=>acc*60+p, 0);
 }
-
 function fmtDuration(t){
   const h = Math.floor(t/3600), m = Math.floor((t%3600)/60), s = Math.floor(t%60);
   return (h>0? h+"h ":"") + (m>0||h>0? m+"m ":"") + s+"s";
 }
-
 function normalizeRow(r){
   const fechaRaw = r["Fecha de inicio"] || "";
   const d = fechaRaw ? new Date(fechaRaw) : null;
   const campana = r["Campa\u00f1a"] || "";
   return {
-    fechaRaw,
-    fecha: d && !isNaN(d) ? d : null,
-    tipo: r["Archivo"] || "",
-    campana,
-    grupo: grupoDeCampana(campana),
+    fechaRaw, fecha: d && !isNaN(d) ? d : null,
+    tipo: r["Archivo"] || "", campana, grupo: grupoDeCampana(campana),
     agente: r["Agente_Atendi\u00f3"] || "(sin agente)",
-    matricula: r["MATRICULA"] || "",
-    nombre: r["NOMBRE"] || "",
-    disposicion: r["Disp."] || "",
-    exito: (r["\u00c9xito"] || "").trim(),
+    matricula: r["MATRICULA"] || "", nombre: r["NOMBRE"] || "",
+    disposicion: r["Disp."] || "", exito: (r["\u00c9xito"] || "").trim(),
     duracionSec: parseDurationToSeconds(r["Tpo. Dur."] || ""),
   };
 }
-
 function populateSelect(sel, values){
   const current = sel.value;
   const first = sel.querySelector("option").textContent;
@@ -303,10 +264,18 @@ function populateSelect(sel, values){
     values.map(v=>`<option value="${v.replace(/"/g,'&quot;')}">${v}</option>`).join("");
   if(values.includes(current)) sel.value = current;
 }
+function mkChart(id, config){
+  if(charts[id]) charts[id].destroy();
+  charts[id] = new Chart($(id), config);
+}
+function countBy(arr, fn){
+  const m = new Map();
+  arr.forEach(r=>{ const k = fn(r) || "(sin dato)"; m.set(k,(m.get(k)||0)+1); });
+  return m;
+}
+const topN = (map,n)=>[...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,n);
 
-const uniqueSorted = arr => [...new Set(arr.filter(Boolean))].sort((a,b)=>a.localeCompare(b));
-const $ = id => document.getElementById(id);
-
+/* ---------------- Bitácora ---------------- */
 function applyFilters(){
   const q = $("fSearch").value.trim().toLowerCase();
   const grupo = $("fGrupo").value, tipo = $("fTipo").value;
@@ -327,14 +296,10 @@ function applyFilters(){
   page = 1;
   renderKPIs(); renderCharts(); renderTable();
 }
-
-// Las campañas disponibles dependen del grupo elegido
 function refreshCampanaOptions(){
   const g = $("fGrupo").value;
-  const list = RAW.filter(r=>!g || r.grupo===g).map(r=>r.campana);
-  populateSelect($("fCampana"), uniqueSorted(list));
+  populateSelect($("fCampana"), uniqueSorted(RAW.filter(r=>!g || r.grupo===g).map(r=>r.campana)));
 }
-
 function renderKPIs(){
   const total = FILTERED.length;
   const exito = FILTERED.filter(r=>r.exito.toLowerCase()==="exitoso" || r.disposicion.toLowerCase().startsWith("exitoso") || r.exito==="Si").length;
@@ -343,24 +308,10 @@ function renderKPIs(){
   $("kpiAgentes").textContent = new Set(FILTERED.map(r=>r.agente).filter(Boolean)).size.toLocaleString("es-MX");
   $("kpiExito").textContent = total ? Math.round(100*exito/total)+"%" : "0%";
 }
-
-function countBy(arr, fn){
-  const m = new Map();
-  arr.forEach(r=>{ const k = fn(r) || "(sin dato)"; m.set(k,(m.get(k)||0)+1); });
-  return m;
-}
-const topN = (map,n)=>[...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,n);
-
-function mkChart(id, config){
-  if(charts[id]) charts[id].destroy();
-  charts[id] = new Chart($(id), config);
-}
-
 function renderCharts(){
   const base = {responsive:true, maintainAspectRatio:false};
   const noLegend = {legend:{display:false}};
 
-  // Línea de tiempo
   const dayCounts = new Map();
   FILTERED.forEach(r=>{
     if(!r.fecha) return;
@@ -374,7 +325,6 @@ function renderCharts(){
     options:{...base, plugins:noLegend, scales:{y:{beginAtZero:true}, x:{grid:{display:false}}}}
   });
 
-  // Grupo de campaña
   const gc = countBy(FILTERED, r=>r.grupo);
   const gLabels = GROUP_ORDER.filter(g=>gc.has(g));
   mkChart("chartGrupo", {
@@ -383,7 +333,6 @@ function renderCharts(){
     options:{...base, cutout:"62%", plugins:{legend:{position:"bottom", labels:{boxWidth:12, usePointStyle:true}}}}
   });
 
-  // Agentes
   const ag = topN(countBy(FILTERED, r=>r.agente), 15);
   mkChart("chartAgente", {
     type:"bar",
@@ -391,7 +340,6 @@ function renderCharts(){
     options:{...base, indexAxis:"y", plugins:noLegend, scales:{x:{beginAtZero:true}, y:{grid:{display:false}}}}
   });
 
-  // Campañas
   const cp = topN(countBy(FILTERED, r=>r.campana), 12);
   mkChart("chartCampana", {
     type:"bar",
@@ -399,7 +347,6 @@ function renderCharts(){
     options:{...base, indexAxis:"y", plugins:noLegend, scales:{x:{beginAtZero:true}, y:{grid:{display:false}}}}
   });
 }
-
 function sortedFiltered(){
   const arr = [...FILTERED];
   arr.sort((a,b)=>{
@@ -411,7 +358,6 @@ function sortedFiltered(){
   });
   return arr;
 }
-
 function renderTable(){
   const sorted = sortedFiltered();
   const totalPages = Math.max(1, Math.ceil(sorted.length/PAGE_SIZE));
@@ -437,42 +383,187 @@ function renderTable(){
   $("prevPage").disabled = page<=1;
   $("nextPage").disabled = page>=totalPages;
 
-  document.querySelectorAll("thead th").forEach(th=>{
+  document.querySelectorAll("#viewBitacora thead th").forEach(th=>{
     const on = th.dataset.key === sortKey;
     th.classList.toggle("sorted", on);
     th.dataset.arrow = on ? (sortDir===1 ? "▲" : "▼") : "";
   });
 }
 
+/* ---------------- Promesas de pago ---------------- */
+let P_RAW = [], P_FILTERED = [], pPage = 1, pSortKey = "fecha", pSortDir = -1;
+const PROMESA_COLORS = ["#14284b","#13857a","#d9922b","#b5483a","#6a7690"];
+const money = n => n.toLocaleString("es-MX",{style:"currency",currency:"MXN",maximumFractionDigits:0});
+
+// Busca la columna por el inicio de su encabezado (los encabezados del Sheet son largos)
+function col(r, prefix){
+  const p = prefix.toLowerCase();
+  const k = Object.keys(r).find(k=>k.trim().toLowerCase().startsWith(p));
+  return k ? (r[k] || "").toString().trim() : "";
+}
+function parseDT(s){
+  if(!s) return null;
+  const d = new Date(s.replace(" ","T")+"Z");
+  return isNaN(d) ? null : d;
+}
+function parseNum(s){
+  const n = parseFloat((s||"").replace(/[^0-9,.-]/g,"").replace(",","."));
+  return isNaN(n) ? 0 : n;
+}
+function normalizePromesa(r){
+  return {
+    fecha: parseDT(col(r,"Fecha_Gestion")),
+    fechaPromesa: parseDT(col(r,"Fecha_Promesa")),
+    tipo: col(r,"Tipo de contacto"),
+    matricula: col(r,"Matricula"),
+    nombre: col(r,"NOMBRE"),
+    asesor: col(r,"Asesor"),
+    supervisor: col(r,"SUPERVISOR"),
+    monto: parseNum(col(r,"Monto a pagar")),
+    pagado: parseNum(col(r,"Pagos_Realizados")),
+    valid: col(r,"Validacion"),
+    check: col(r,"Check"),
+    mora: col(r,"MORA INICIAL"),
+  };
+}
+const fmtDate = (d,time) => d ? d.toLocaleString("es-MX",{timeZone:"UTC",day:"2-digit",month:"2-digit",year:"numeric",...(time?{hour:"2-digit",minute:"2-digit"}:{})}) : "—";
+
+function applyPromesaFilters(){
+  const q = $("pSearch").value.trim().toLowerCase();
+  const f = {tipo:$("pTipo").value, asesor:$("pAsesor").value, supervisor:$("pSup").value, valid:$("pValid").value, check:$("pCheck").value};
+  const desde = $("pDesde").value ? new Date($("pDesde").value+"T00:00:00Z") : null;
+  const hasta = $("pHasta").value ? new Date($("pHasta").value+"T23:59:59Z") : null;
+  P_FILTERED = P_RAW.filter(r=>{
+    for(const k in f) if(f[k] && r[k] !== f[k]) return false;
+    if(desde && (!r.fecha || r.fecha < desde)) return false;
+    if(hasta && (!r.fecha || r.fecha > hasta)) return false;
+    if(q && !(r.matricula+" "+r.nombre).toLowerCase().includes(q)) return false;
+    return true;
+  });
+  pPage = 1;
+  renderPromesaKPIs(); renderPromesaCharts(); renderPromesaTable();
+}
+function renderPromesaKPIs(){
+  const t = P_FILTERED.length;
+  const ef = P_FILTERED.filter(r=>r.valid.toLowerCase()==="efectiva").length;
+  $("pKpiTotal").textContent = t.toLocaleString("es-MX");
+  $("pKpiMonto").textContent = money(P_FILTERED.reduce((a,r)=>a+r.monto,0));
+  $("pKpiPagado").textContent = money(P_FILTERED.reduce((a,r)=>a+r.pagado,0));
+  $("pKpiEfectivas").textContent = t ? Math.round(100*ef/t)+"%" : "0%";
+}
+function renderPromesaCharts(){
+  const base = {responsive:true, maintainAspectRatio:false};
+  const dc = new Map();
+  P_FILTERED.forEach(r=>{ if(!r.fecha) return; const k = r.fecha.toISOString().slice(0,10); dc.set(k,(dc.get(k)||0)+1); });
+  const days = [...dc.keys()].sort();
+  mkChart("pChartDia", {
+    type:"bar",
+    data:{labels:days, datasets:[{data:days.map(d=>dc.get(d)), backgroundColor:"#14284b", borderRadius:3}]},
+    options:{...base, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}, x:{grid:{display:false}}}}
+  });
+  const tc = topN(countBy(P_FILTERED, r=>r.tipo), 8);
+  mkChart("pChartTipo", {
+    type:"doughnut",
+    data:{labels:tc.map(x=>x[0]), datasets:[{data:tc.map(x=>x[1]), backgroundColor:tc.map((_,i)=>PROMESA_COLORS[i%PROMESA_COLORS.length]), borderWidth:2, borderColor:"#fff"}]},
+    options:{...base, cutout:"62%", plugins:{legend:{position:"bottom", labels:{boxWidth:12, usePointStyle:true}}}}
+  });
+}
+function renderPromesaTable(){
+  const NUM = ["monto","pagado"], DATE = ["fecha","fechaPromesa"];
+  const sorted = [...P_FILTERED].sort((a,b)=>{
+    let av = a[pSortKey], bv = b[pSortKey];
+    if(DATE.includes(pSortKey)){ av = av ? av.getTime() : 0; bv = bv ? bv.getTime() : 0; }
+    else if(!NUM.includes(pSortKey)){ av = (av||"").toLowerCase(); bv = (bv||"").toLowerCase(); }
+    return av < bv ? -pSortDir : av > bv ? pSortDir : 0;
+  });
+  const totalPages = Math.max(1, Math.ceil(sorted.length/PAGE_SIZE));
+  pPage = Math.min(pPage, totalPages);
+  const rows = sorted.slice((pPage-1)*PAGE_SIZE, pPage*PAGE_SIZE);
+
+  $("pBody").innerHTML = rows.length ? rows.map(r=>`
+    <tr>
+      <td class="num-cell">${fmtDate(r.fecha)}</td>
+      <td class="num-cell">${r.matricula || "—"}</td>
+      <td>${r.nombre || "—"}</td>
+      <td>${r.asesor || "—"}</td>
+      <td>${r.tipo}</td>
+      <td class="num-cell">${fmtDate(r.fechaPromesa)}</td>
+      <td class="num-cell">${money(r.monto)}</td>
+      <td class="num-cell">${money(r.pagado)}</td>
+      <td>${r.valid ? `<span class="badge ${r.valid.toLowerCase()==="efectiva"?"ok":"bad"}">${r.valid}</span>` : "—"}</td>
+      <td>${r.check || "—"}</td>
+      <td>${r.supervisor || "—"}</td>
+      <td>${r.mora || "—"}</td>
+    </tr>`).join("")
+    : `<tr><td colspan="12" class="empty-note">Sin resultados. Ajusta o limpia los filtros.</td></tr>`;
+
+  $("pTableCount").textContent = sorted.length.toLocaleString("es-MX") + " promesas";
+  $("pPagerInfo").textContent = `Página ${pPage} de ${totalPages}`;
+  $("pPrev").disabled = pPage<=1;
+  $("pNext").disabled = pPage>=totalPages;
+  document.querySelectorAll("#pHead th").forEach(th=>{
+    const on = th.dataset.key === pSortKey;
+    th.classList.toggle("sorted", on);
+    th.dataset.arrow = on ? (pSortDir===1 ? "▲" : "▼") : "";
+  });
+}
+
+/* ---------------- Eventos ---------------- */
 function wireEvents(){
+  // Pestañas
+  document.querySelectorAll(".tab").forEach(tab=>{
+    tab.addEventListener("click", ()=>{
+      document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active", t===tab));
+      ["viewBitacora","viewPromesas"].forEach(v=>$(v).hidden = (v !== tab.dataset.view));
+      // Chart.js necesita recalcular tamaño al mostrar la vista
+      Object.values(charts).forEach(c=>c.resize());
+    });
+  });
+
+  // Bitácora
   ["fSearch","fTipo","fCampana","fAgente","fDesde","fHasta"].forEach(id=>{
     $(id).addEventListener("input", applyFilters);
     $(id).addEventListener("change", applyFilters);
   });
-  $("fGrupo").addEventListener("change", ()=>{
-    $("fCampana").value = "";
-    refreshCampanaOptions();
-    applyFilters();
-  });
+  $("fGrupo").addEventListener("change", ()=>{ $("fCampana").value = ""; refreshCampanaOptions(); applyFilters(); });
   $("resetBtn").addEventListener("click", ()=>{
     ["fSearch","fDesde","fHasta","fGrupo","fTipo","fCampana","fAgente"].forEach(id=>$(id).value="");
-    refreshCampanaOptions();
-    applyFilters();
+    refreshCampanaOptions(); applyFilters();
   });
   $("prevPage").addEventListener("click", ()=>{ page--; renderTable(); });
   $("nextPage").addEventListener("click", ()=>{ page++; renderTable(); });
-  document.querySelectorAll("thead th").forEach(th=>{
+  document.querySelectorAll("#viewBitacora thead th").forEach(th=>{
     th.addEventListener("click", ()=>{
       const k = th.dataset.key;
       if(sortKey===k){ sortDir *= -1; } else { sortKey = k; sortDir = 1; }
       renderTable();
     });
   });
-  $("refreshBtn").addEventListener("click", loadData);
+
+  // Promesas
+  ["pSearch","pTipo","pAsesor","pSup","pValid","pCheck","pDesde","pHasta"].forEach(id=>{
+    $(id).addEventListener("input", applyPromesaFilters);
+    $(id).addEventListener("change", applyPromesaFilters);
+  });
+  $("pResetBtn").addEventListener("click", ()=>{
+    ["pSearch","pTipo","pAsesor","pSup","pValid","pCheck","pDesde","pHasta"].forEach(id=>$(id).value="");
+    applyPromesaFilters();
+  });
+  $("pPrev").addEventListener("click", ()=>{ pPage--; renderPromesaTable(); });
+  $("pNext").addEventListener("click", ()=>{ pPage++; renderPromesaTable(); });
+  document.querySelectorAll("#pHead th").forEach(th=>{
+    th.addEventListener("click", ()=>{
+      const k = th.dataset.key;
+      if(pSortKey===k){ pSortDir *= -1; } else { pSortKey = k; pSortDir = 1; }
+      renderPromesaTable();
+    });
+  });
+
+  $("refreshBtn").addEventListener("click", loadAll);
 }
 
-function loadData(){
-  $("lastUpdated").textContent = "Actualizando…";
+/* ---------------- Carga de datos ---------------- */
+function loadData(done){
   Papa.parse(CSV_URL, {
     download:true, header:true, skipEmptyLines:true,
     complete: results=>{
@@ -481,18 +572,42 @@ function loadData(){
       populateSelect($("fTipo"), uniqueSorted(RAW.map(r=>r.tipo)));
       populateSelect($("fAgente"), uniqueSorted(RAW.map(r=>r.agente)));
       refreshCampanaOptions();
-      $("lastUpdated").textContent = "Actualizado " + new Date().toLocaleString("es-MX");
       applyFilters();
+      done(true);
     },
-    error: err=>{
-      $("lastUpdated").textContent = "Error al cargar los datos";
-      console.error(err);
-    }
+    error: err=>{ console.error(err); done(false); }
   });
+}
+function loadPromesas(done){
+  Papa.parse(PROMESAS_URL, {
+    download:true, header:true, skipEmptyLines:true,
+    complete: results=>{
+      // Solo filas cuyo "Tipo de contacto" contiene "promesa" (cualquier variante)
+      P_RAW = results.data.map(normalizePromesa).filter(r=>r.tipo.toLowerCase().includes("promesa"));
+      populateSelect($("pTipo"), uniqueSorted(P_RAW.map(r=>r.tipo)));
+      populateSelect($("pAsesor"), uniqueSorted(P_RAW.map(r=>r.asesor)));
+      populateSelect($("pSup"), uniqueSorted(P_RAW.map(r=>r.supervisor)));
+      populateSelect($("pValid"), uniqueSorted(P_RAW.map(r=>r.valid)));
+      populateSelect($("pCheck"), uniqueSorted(P_RAW.map(r=>r.check)));
+      applyPromesaFilters();
+      done(true);
+    },
+    error: err=>{ console.error(err); done(false); }
+  });
+}
+function loadAll(){
+  $("lastUpdated").textContent = "Actualizando…";
+  let pending = 2, ok = true;
+  const done = success=>{
+    ok = ok && success;
+    if(--pending === 0) $("lastUpdated").textContent = ok ? "Actualizado " + new Date().toLocaleString("es-MX") : "Error al cargar los datos";
+  };
+  loadData(done);
+  loadPromesas(done);
 }
 
 wireEvents();
-loadData();
+loadAll();
 </script>
 </body>
 </html>
